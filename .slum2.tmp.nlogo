@@ -7,9 +7,6 @@ residents-own [
   DesiredCommute
   ]
 
-// creat new command
-it's going to have some really interesting new stuff in it
-
 
 
 to setup
