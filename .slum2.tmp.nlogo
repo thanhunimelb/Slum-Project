@@ -102,15 +102,15 @@ to Mapped
 if UpdateMap = true [ if not any? residents in-radius 1 [ set pcolor black ] ]
 end
 
-; to avoid-house
+;to avoid-house
 ; if [pcolor] of any? patches in-radius 3 = green [set heading heading - 180]
 ; end
 @#$#@#$#@
 GRAPHICS-WINDOW
-747
-124
-1548
-926
+470
+115
+1011
+657
 -1
 -1
 13.0
@@ -123,10 +123,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--30
-30
--30
-30
+-20
+20
+-20
+20
 0
 0
 1
