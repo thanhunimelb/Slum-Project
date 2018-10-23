@@ -1,5 +1,7 @@
 breed [ residents resident ]
 breed [ centres centre ]
+breed [ buildings building ]
+
 residents-own [
 
   toofar?
@@ -10,18 +12,29 @@ residents-own [
 
 
 to setup
-  clear-all
+ clear-all
 
+ ;; create 2 streets at 2 sides of the site.
+  ask patches with [pycor <= -72 and pycor >= -80]
+    [ set pcolor gray ]
+
+  ask patches with [pycor <= 80 and pycor >= 72]
+    [ set pcolor gray ]
+
+ ;; create two centres
  create-centres 1
-    [ set color red set shape "dot" set xcor 0  set ycor -12 set size 1 ]
-
+    [ set color red set shape "dot" set xcor 0  set ycor -70 set size 5 ]
  create-centres 1
-    [ set color red set shape "dot" set xcor 0  set ycor 12 set size 1 ]
+    [ set color red set shape "dot" set xcor 0  set ycor 70 set size 5 ]
 
+ ;; create residents
   ask n-of number patches
     [ sprout-residents 1
-       [ set size 1 set shape "square" set desiredcommute random commute set targetcentre one-of centres set xcor random-normal 0 20 set ycor random-normal 0 20 set color blue ]]
+       [ set size 1 set shape "person" set desiredcommute random commute set xcor ( (random (160))- 80 ) set ycor ( (random (160))- 80 )  set color (random 100) ]]
 
+ ;; residents choose their center base on their distance to the 2 centers
+  ask residents with [ycor <= 0]  [ set targetcentre (centre 0)]
+  ask residents with [ycor > 0 ]  [ set targetcentre (centre 1)]
   reset-ticks
 end
 
@@ -29,14 +42,15 @@ to go
 
   ask residents [
 
-    lookaround
-    moveiftoofar
-    avoidothers
-    buildhouse
+    lookaround  ;; residents check their distance to their chosen centre
+
+    moveiftoofar  ;; residents get close to their chosen centre and avoid land which have been claimed by other residents
+
+    claimland ;; residents claim their land to build house
 
     ]
- ask patches  [ Mapped ]
-
+  ask patches with [ pcolor = green ]
+    [buildhouse] ;; residents build house their house
 
 end
 
@@ -55,78 +69,83 @@ to moveiftoofar
 end
 
 to movecloser
-  face targetcentre fd .1
+  face targetcentre fd 1
+  if house = "rectangle" [avoidothers]
+  if house  = "square"  [avoidothers2]
 end
 
-to buildhouse
+to claimland
 
-  if toofar? = 0
-    [ paintpatch ]
-end
-
-to avoidothers
-
-  if any? other residents in-radius 3
-    [ keepgoing ]
-end
-
-to keepgoing
-  set desiredcommute (desiredcommute + 5)
-    face targetcentre bk random 5
-end
-
-
-to paintpatch
-  ask residents
+   if toofar? = 0
   [
     if house = "rectangle"
-      [ paint-agents patches at-points [[0 0] [0 1] [0 -1] [-1 0] [1 0] [1 1] [-1 1] [-1 -1] [1 -1 ] [1 2 ] [-1 2] [0 2]] ]
+      [ ask patches at-points [[0 0] [0 1] [0 -1] [-1 0] [1 0] [1 1] [-1 1] [-1 -1] [1 -1 ] [1 2 ] [-1 2] [0 2]] [ set pcolor green ] ]
     if house  = "square"
-      [ paint-agents patches at-points [[0 0] [0 1] [0 -1] [-1 0] [1 0] [1 1] [-1 1] [-1 -1] [1 -1 ]] ]
-    if house  = "L-shape"
-      [ paint-agents patches at-points [[-1 1] [-1 0] [-1 -1] [0 -1] [1 -1 ]] ]
+      [ ask patches at-points [[0 0] [0 1] [0 -1] [-1 0] [1 0] [1 1] [-1 1] [-1 -1] [1 -1 ]] [ set pcolor green ]  ]
 
   ]
   display
 end
 
+to avoidothers
 
-to paint-agents [agents]
-  ask agents [ set pcolor green ]
+     ask residents with [ toofar? = 1 ]
+     [
+      if any? patches at-points [[0 0] [0 1] [0 -1] [-1 0] [1 0] [1 1] [-1 1] [-1 -1] [1 -1 ]] with [ pcolor = green ]
+      [keepgoing]
+      ]
+end
+
+ to avoidothers2
+
+     ask residents with [ toofar? = 1 ]
+     [
+      if any? patches at-points [[0 0] [0 1] [0 -1] [-1 0] [1 0] [1 1] [-1 1] [-1 -1] [1 -1 ] [1 2 ] [-1 2] [0 2]] with [ pcolor = green ]
+      [keepgoing]
+      ]
+
+end
+
+to keepgoing
+  set desiredcommute (desiredcommute + 0.1)
+  face targetcentre
+  bk 1
+end
+
+to buildhouse
+  if any? residents-here
+    [ask self
+      [ sprout-buildings 1
+       [ set size 3 set shape "square" set heading 180 set color red ]
+      ]
+    ]
+
 end
 
 
 
-
-to Mapped
-if UpdateMap = true [ if not any? residents in-radius 1 [ set pcolor black ] ]
-end
-
-;to avoid-house
-; if [pcolor] of any? patches in-radius 3 = green [set heading heading - 180]
-; end
 @#$#@#$#@
 GRAPHICS-WINDOW
-470
-115
-1011
-657
+262
+100
+592
+431
 -1
 -1
-13.0
+2.0
 1
 10
 1
 1
 1
 0
+0
+0
 1
-1
-1
--20
-20
--20
-20
+-80
+80
+-80
+80
 0
 0
 1
@@ -134,10 +153,10 @@ ticks
 30.0
 
 BUTTON
-90
-114
-153
-147
+91
+116
+157
+152
 NIL
 setup
 NIL
@@ -157,34 +176,34 @@ CHOOSER
 270
 house
 house
-"square" "L-shape" "rectangle"
+"square" "rectangle"
 0
 
 SLIDER
-71
+73
 172
-243
+245
 205
 number
 number
 0
-100
-48.0
+1000
+1000.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-257
-171
-429
-204
+68
+287
+240
+320
 commute
 commute
 0
 16
-4.0
+3.0
 1
 1
 NIL
