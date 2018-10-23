@@ -30,7 +30,7 @@ to setup
  ;; create residents
   ask n-of number patches
     [ sprout-residents 1
-       [ set size 1 set shape "person" set desiredcommute random commute set xcor ( (random (160))- 80 ) set ycor ( (random (160))- 80 )  set color (random 100) ]]
+       [ set size 1 set shape "person" set desiredcommute random commute set xcor ( (random (140))- 70 ) set ycor ( (random (140))- 70 )  set color (random 100) ]]
 
  ;; residents choose their center base on their distance to the 2 centers
   ask residents with [ycor <= 0]  [ set targetcentre (centre 0)]
@@ -121,7 +121,6 @@ to buildhouse
     ]
 
 end
-
 
 
 @#$#@#$#@
