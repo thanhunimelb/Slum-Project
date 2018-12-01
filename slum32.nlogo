@@ -121,17 +121,17 @@ to buildhouse
   if any? residents-here with [ toofar? = 0 ]
     [ask self
       [ sprout-buildings 1
-       [ set size 3 set shape "square" set heading 180 set color red ]
+       [ set size 3 set shape "square" set heading 180 set color white ]
       ]
     ]
 
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-262
-102
-791
-632
+268
+32
+797
+562
 -1
 -1
 6.4321
@@ -179,18 +179,18 @@ SLIDER
 number
 number
 0
-1000
-6.0
+100
+21.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-68
-287
-240
-320
+74
+217
+246
+250
 commute
 commute
 0
@@ -230,15 +230,15 @@ UpdateMap
 -1000
 
 SLIDER
-67
-337
-239
-370
+74
+263
+246
+296
 ntick
 ntick
 0
 5000
-2166.0
+2611.0
 1
 1
 NIL
